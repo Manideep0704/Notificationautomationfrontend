@@ -1,3 +1,15 @@
+function generatePostId() {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+    return 'POST_' + window.crypto.randomUUID().replaceAll('-', '').slice(0, 24);
+  }
+  if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+    const bytes = new Uint8Array(12);
+    window.crypto.getRandomValues(bytes);
+    return 'POST_' + Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+  }
+  return 'POST_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
+}
+
 function initOperations() {
   const nav = document.querySelector('.nav-menu');
   const button = document.createElement('button');
@@ -43,7 +55,7 @@ function initOperations() {
   bindOperationForm('publish-form', '/api/publish', 'POST', 'publish-feedback', values => {
     delete values.approved; values.approval_status = 'approved'; return values;
   });
-  document.querySelector('#publish-form [name=post_id]').value = 'POST_' + crypto.randomUUID().replaceAll('-','').slice(0,24);
+  document.querySelector('#publish-form [name=post_id]').value = generatePostId();
   document.getElementById('refresh-queue').addEventListener('click', loadQueue);
   document.getElementById('validate-provider').addEventListener('click', async event => {
     event.target.disabled = true;
