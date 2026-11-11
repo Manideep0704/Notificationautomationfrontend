@@ -1,0 +1,28 @@
+[[redirects]]
+  from = "/api/*"
+  to = "http://62.72.29.27:8050/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/auth/*"
+  to = "http://62.72.29.27:8050/auth/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/health"
+  to = "http://62.72.29.27:8050/health"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/webhook/*"
+  to = "http://62.72.29.27:8050/webhook/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/login"
+  to = "/login.html"
+  status = 200

@@ -1,12 +1,6 @@
-let csrfToken = '';
+let csrfToken = sessionStorage.getItem('csrf_token') || '';
+window.__csrfToken = csrfToken;
 const originalFetch = window.fetch.bind(window);
-window.fetch = async (input, options = {}) => {
-  const headers = new Headers(options.headers || {});
-  if (!['GET','HEAD','OPTIONS'].includes((options.method || 'GET').toUpperCase())) headers.set('X-CSRF-Token', csrfToken);
-  const response = await originalFetch(input, {...options, headers});
-  if (response.status === 401 && location.pathname !== '/login') location.assign('/login');
-  return response;
-};
 // ==============================================================================
 // IRYAX GLOBAL - AGENCY SOCIAL HUB DASHBOARD ENGINE
 // Ultra-modern, resilient B2B Client & Publishing Controller
@@ -193,8 +187,16 @@ async function checkConnection() {
 // ==============================================================================
 document.addEventListener('DOMContentLoaded', async () => {
   const session = await originalFetch('/auth/session');
-  if (!session.ok) { location.assign('/login'); return; }
+  if (!session.ok) {
+    sessionStorage.removeItem('auth_token');
+    sessionStorage.removeItem('csrf_token');
+    if (typeof window.navigateToLogin === 'function') window.navigateToLogin();
+    else location.assign('/login');
+    return;
+  }
   csrfToken = (await session.json()).csrf_token;
+  window.__csrfToken = csrfToken;
+  sessionStorage.setItem('csrf_token', csrfToken);
   initOperations();
   checkConnection();
   setInterval(checkConnection, 15000);

@@ -32,7 +32,12 @@ function initOperations() {
     document.getElementById('view-subtitle').textContent = 'Connect accounts, publish approved content, and manage notification recovery.';
   });
   document.getElementById('btn-logout').addEventListener('click', async () => {
-    await fetch('/auth/logout', {method:'POST'}); location.assign('/login');
+    await fetch('/auth/logout', {method:'POST'});
+    sessionStorage.removeItem('auth_token');
+    sessionStorage.removeItem('csrf_token');
+    window.__csrfToken = '';
+    if (typeof window.navigateToLogin === 'function') window.navigateToLogin();
+    else location.assign('/login');
   });
   bindOperationForm('account-form', '/api/social-accounts', 'PUT', 'account-feedback', values => values);
   bindOperationForm('publish-form', '/api/publish', 'POST', 'publish-feedback', values => {
