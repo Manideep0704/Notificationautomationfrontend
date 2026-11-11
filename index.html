@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iryax Global | Social Media Publishing & Client Automation Engine</title>
+  <link rel="stylesheet" href="styles.css?v=20261110_v3">
+</head>
+<body>
+  <div class="app-layout">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">
+            Iryax Global
+          </div>
+          <span class="brand-badge">Agency Social Hub</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <div class="nav-section-title">Navigation</div>
+        <button class="nav-btn active" data-tab="tab-activity">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          <span>Live Activity</span>
+        </button>
+        <button class="nav-btn" data-tab="tab-clients">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Client Directory</span>
+        </button>
+        <button class="nav-btn" data-tab="tab-simulate">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span>Send Post Alert</span>
+        </button>
+        
+        <div class="nav-section-title" style="margin-top: 12px;">Configuration</div>
+        <button class="nav-btn" data-tab="tab-settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Meta API & Settings</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-status-box">
+          <span class="status-beacon"></span>
+          <span id="connection-status" role="status">Checking connection…</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      
+      <!-- Top Bar -->
+      <div class="top-bar">
+        <div class="top-bar-left">
+          <h1 class="page-title" id="view-title">Live Activity & Notifications</h1>
+          <p class="page-subtitle" id="view-subtitle">Real-time social media publishing events and automated client WhatsApp alerts.</p>
+        </div>
+        <div class="top-actions"><button class="btn btn-secondary" id="btn-logout">Sign out</button>
+          <button class="btn btn-secondary" id="btn-refresh-data" title="Refresh all data">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+            <span>Sync</span>
+          </button>
+          <button class="btn btn-primary" id="btn-quick-post">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Send Alert</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab 1: Live Activity -->
+      <div id="tab-activity" class="tab-content active">
+        <div class="metrics-row">
+          <div class="metric-box">
+            <div class="metric-top-bar">
+              <span class="metric-header">Total Posts</span>
+              <div class="metric-icon-wrap" style="color: #4f46e5; background: #eef2ff;">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/></svg>
+              </div>
+            </div>
+            <div class="metric-val" id="metric-total-posts">0</div>
+            <div class="metric-sub">Published to Instagram & FB</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-top-bar">
+              <span class="metric-header">WhatsApp Alerts</span>
+              <div class="metric-icon-wrap" style="color: #10b981; background: #ecfdf5;">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+              </div>
+            </div>
+            <div class="metric-val" id="metric-delivered-notifs">0</div>
+            <div class="metric-sub">Confirmed alerts sent to clients</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-top-bar">
+              <span class="metric-header">Read Rate</span>
+              <div class="metric-icon-wrap" style="color: #8b5cf6; background: #f5f3ff;">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+            <div class="metric-val" id="metric-read-rate">100%</div>
+            <div class="metric-sub">Blue Ticks confirmed</div>
+          </div>
+          <div class="metric-box">
+            <div class="metric-top-bar">
+              <span class="metric-header">Directory Clients</span>
+              <div class="metric-icon-wrap" style="color: #0284c7; background: #f0f9ff;">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+            <div class="metric-val" id="metric-total-clients">0</div>
+            <div class="metric-sub">Active in the client directory</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-toolbar">
+            <div class="toolbar-left">
+              <h3 class="card-title" style="font-size: 15px; font-weight: 700; color: #0f172a;">Recent Publishing & WhatsApp Log</h3>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Post ID</th>
+                  <th>Client</th>
+                  <th>Platform</th>
+                  <th>Caption</th>
+                  <th>Status</th>
+                  <th>WhatsApp Alert</th>
+                  <th>Published At</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="posts-table-body">
+                <tr>
+                  <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 36px;">Loading recent activity...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Clients (Excel) -->
+      <div id="tab-clients" class="tab-content">
+        <div class="card">
+          <div class="card-toolbar">
+            <div class="toolbar-left">
+              <div class="search-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="client-search-input" class="search-input" placeholder="Search by client, ID, Instagram handle, or phone...">
+              </div>
+              <span class="client-count-chip" id="client-count-chip">Synced from the client directory</span>
+            </div>
+            <div class="toolbar-actions">
+              <button class="btn btn-secondary" id="btn-sync-instagram" style="gap: 8px;">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                </svg>
+                <span>Sync Instagram Now</span>
+              </button>
+              <button class="btn btn-primary" id="btn-open-add-client">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Add Client</span>
+              </button>
+            </div>
+          </div>
+          
+          <div class="table-responsive">
+            <table class="data-table clients-directory-table">
+              <thead>
+                <tr>
+                  <th style="width: 96px;">Client ID</th>
+                  <th>Company / Client</th>
+                  <th>Social Channels</th>
+                  <th>WhatsApp Alert Recipients</th>
+                  <th style="width: 100px;">Status</th>
+                  <th style="text-align: right; width: 220px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="clients-table-body">
+                <tr>
+                  <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 36px;">Reading the client directory...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Send Alert Workflow -->
+      <div id="tab-simulate" class="tab-content">
+        <div class="card" style="max-width: 800px;">
+          <div class="card-toolbar">
+            <h3 class="card-title" style="font-size: 16px; font-weight: 700; color: #0f172a;">Send a Notification for an Existing Post</h3>
+          </div>
+          
+          <div style="padding: 24px 24px 0 24px;">
+            <div class="trust-banner">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#16a34a" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+              </svg>
+              <div>
+                <strong>Automated Client Routing:</strong> Select a client below. The system automatically reads their WhatsApp recipient number from <code>the client directory</code> and sends the alert through the sender configured in Settings.
+              </div>
+            </div>
+          </div>
+
+          <form id="simulate-form" style="padding: 16px 24px 24px 24px;">
+            <div class="form-group">
+              <label for="sim-select-client">Target Client (Resolved from the client directory)</label>
+              <select id="sim-select-client" class="form-control">
+                <!-- Dynamically populated from the client directory -->
+              </select>
+              <span class="form-hint">The client's Page ID and WhatsApp destination are matched dynamically.</span>
+            </div>
+
+            <div class="form-group">
+              <label for="sim-post-caption">Post Caption</label>
+              <textarea id="sim-post-caption" class="form-control" rows="3">Excited to announce our new update! Visit our website to learn more. #Announcement</textarea>
+            </div>
+
+            <div class="form-group">
+              <label for="sim-post-url">Live Post URL</label>
+              <input type="url" id="sim-post-url" class="form-control" placeholder="https://www.facebook.com/your-post-id" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" id="btn-submit-simulation" style="padding: 12px;">
+              <span>Send WhatsApp Notification</span>
+            </button>
+          </form>
+
+          <div id="simulation-result-box" style="display: none; padding: 0 24px 24px 24px;">
+            <div class="diagnostic-alert success" id="sim-alert">
+              <div>
+                <strong id="sim-result-title" style="display: block; font-size: 14px;">Notification Dispatched Successfully</strong>
+                <div id="sim-result-details" style="margin-top: 6px; font-size: 13px; line-height: 1.6;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Meta API Settings -->
+      <div id="tab-settings" class="tab-content">
+        <div style="max-width: 800px;">
+          <div id="settings-feedback-box" style="display: none;" class="diagnostic-alert">
+            <span id="settings-feedback-text"></span>
+          </div>
+
+          <div class="trust-banner">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <div>
+              <strong>Secure Backend Storage:</strong> Credentials are saved directly into your local <code>.env</code> file. They are never exposed in browser source code.
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-toolbar">
+              <div>
+                <h3 class="card-title" style="font-size: 16px; font-weight: 700; color: #0f172a;">Meta WhatsApp Cloud API Configuration</h3>
+                <p style="font-size: 13px; color: var(--text-secondary); margin-top: 3px;">Active sender: <strong>+91 90104 80101</strong> (Iryax / Phone ID: 1356566347541367)</p>
+              </div>
+              <button class="btn btn-secondary" id="btn-test-wa-settings">
+                <span>Test Connection</span>
+              </button>
+            </div>
+            
+            <form id="settings-form" style="padding: 24px;">
+              <div class="form-group">
+                <label for="cfg-phone-id">WhatsApp Phone Number ID</label>
+                <input type="text" id="cfg-phone-id" class="form-control" placeholder="e.g. 1356566347541367">
+                <span class="form-hint">Found in Meta Developer Portal ➔ WhatsApp ➔ API Setup</span>
+              </div>
+
+              <div class="form-group">
+                <label for="cfg-waba-id">WhatsApp Business Account ID (WABA ID)</label>
+                <input type="text" id="cfg-waba-id" class="form-control" placeholder="e.g. 1718319859454686">
+              </div>
+
+              <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                  <label for="cfg-token" style="margin-bottom: 0;">Permanent Meta Access Token</label>
+                  <span id="token-status-badge" class="badge badge-warning">Write-Only</span>
+                </div>
+                <input type="password" id="cfg-token" class="form-control" placeholder="•••••••••••••••• (Leave blank to keep active token)" autocomplete="new-password">
+                <span class="form-hint">For 24/7 uninterrupted operation, generate a permanent System User Token in Meta Business Suite.</span>
+              </div>
+
+              <div class="form-group">
+                <label for="cfg-slack">Slack Alerts Webhook URL (Optional)</label>
+                <input type="url" id="cfg-slack" class="form-control" placeholder="https://hooks.slack.com/services/...">
+              </div>
+
+              <button type="submit" class="btn btn-primary" id="btn-save-cfg">
+                <span>Save Configuration</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Add Client Modal -->
+  <div class="modal-overlay" id="add-client-modal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3 class="card-title">Add Client to the client directory</h3>
+        <button class="modal-close" id="btn-close-modal">&times;</button>
+      </div>
+      <form id="add-client-form" class="modal-body">
+        <div class="form-group">
+          <label for="new-client-id">Client ID</label>
+          <input type="text" id="new-client-id" class="form-control" placeholder="e.g. CLIENT_006" required>
+        </div>
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 14px;">
+          <div style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Display Details (Company Info)</div>
+          <div class="form-group" style="margin-bottom: 8px;">
+            <label for="new-client-name">Company / Client Name</label>
+            <input type="text" id="new-client-name" class="form-control" placeholder="e.g. Serum Lab" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="new-company-number">Company Phone Number <span style="font-weight: normal; color: var(--text-muted);">(For Info / Reference)</span></label>
+            <div style="display: flex; align-items: center;">
+              <span style="background: #e2e8f0; border: 1px solid #cbd5e1; border-right: none; border-radius: 6px 0 0 6px; padding: 0 10px; height: 38px; display: inline-flex; align-items: center; font-size: 14px; font-weight: 700; color: #475569;">+</span>
+              <input type="tel" id="new-company-number" class="form-control" placeholder="919014424455" style="border-radius: 0 6px 6px 0; height: 38px;">
+            </div>
+            <span class="form-hint" style="font-size: 11px; color: var(--text-muted); margin-top: 3px; display: block;">Official company / office phone number for display & general reference.</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="new-page-id">Facebook Page ID <span style="font-weight: normal; color: var(--text-muted);">(Optional if Instagram provided)</span></label>
+          <input type="text" id="new-page-id" class="form-control" placeholder="e.g. 116439281052574">
+        </div>
+        <div class="form-group">
+          <label for="new-instagram-handle">Instagram Handle <span style="font-weight: normal; color: var(--text-muted);">(Optional if Facebook provided)</span></label>
+          <input type="text" id="new-instagram-handle" class="form-control" placeholder="e.g. @serum_labs">
+        </div>
+        <div class="form-group">
+          <label for="new-client-template" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>WhatsApp Message Template</span>
+            <span style="font-size: 10px; font-weight: 600; color: #2563eb; background: #eff6ff; padding: 2px 7px; border-radius: 6px; text-transform: uppercase;">Per-client format</span>
+          </label>
+          <select id="new-client-template" class="form-control" style="font-size: 13px;">
+            <option value="">Default (Photo Header + Post Link)</option>
+            <option value="business_ig_media_link_alert">📸 Photo Header + Post Link (Image + URL)</option>
+            <option value="business_post_link_exact">🔗 Post Link Alert (Text Only)</option>
+            <option value="business_media_post_alert">🖼️ Photo Header Only (No URL)</option>
+            <option value="business_compact_engagement">⚡ Compact Engagement (Clean Greeting + Post Link)</option>
+            <option value="business_post_published_link_alert">📝 Detailed Post Alert (Greeting + Caption + Link)</option>
+            <option value="tms_post_published_alert">🏢 TMS Service Alert (Team TMS Format)</option>
+          </select>
+          <span class="form-hint" style="font-size: 11px; color: var(--text-muted); margin-top: 3px; display: block;">Select which WhatsApp template format is dispatched when a post goes live.</span>
+        </div>
+        <div style="margin: 18px 0 10px 0; border-top: 1px solid #e2e8f0; padding-top: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div>
+              <span style="font-size: 12px; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: 0.5px;">Contact Persons & WhatsApp Alert Numbers</span>
+              <span style="display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px;">Add as many recipients as needed. Every number gets personalized alerts with their own name.</span>
+            </div>
+            <button type="button" id="btn-add-contact-row" class="btn btn-xs btn-outline-primary" style="font-size: 11px; padding: 5px 12px; display: inline-flex; align-items: center; gap: 5px; border-radius: 6px; font-weight: 600;">
+              <span style="font-weight: bold; font-size: 13px; line-height: 1;">+</span>
+              <span>Add Recipient</span>
+            </button>
+          </div>
+          <div id="new-contacts-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 16px; padding: 12px;">
+          <span>Save Client</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Edit Client Modal -->
+  <div class="modal-overlay" id="edit-client-modal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h3 class="card-title">Edit Client Details</h3>
+        <button class="modal-close" id="btn-close-edit-modal">&times;</button>
+      </div>
+      <form id="edit-client-form" class="modal-body">
+        <input type="hidden" id="edit-row-index">
+        <div class="form-group">
+          <label for="edit-client-id">Client ID</label>
+          <input type="text" id="edit-client-id" class="form-control" required>
+        </div>
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin-bottom: 14px;">
+          <div style="font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Display Details (Company Info)</div>
+          <div class="form-group" style="margin-bottom: 8px;">
+            <label for="edit-client-name">Company / Client Name</label>
+            <input type="text" id="edit-client-name" class="form-control" required>
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label for="edit-company-number">Company Phone Number <span style="font-weight: normal; color: var(--text-muted);">(For Info / Reference)</span></label>
+            <div style="display: flex; align-items: center;">
+              <span style="background: #e2e8f0; border: 1px solid #cbd5e1; border-right: none; border-radius: 6px 0 0 6px; padding: 0 10px; height: 38px; display: inline-flex; align-items: center; font-size: 14px; font-weight: 700; color: #475569;">+</span>
+              <input type="tel" id="edit-company-number" class="form-control" placeholder="919014424455" style="border-radius: 0 6px 6px 0; height: 38px;">
+            </div>
+            <span class="form-hint" style="font-size: 11px; color: var(--text-muted); margin-top: 3px; display: block;">Official company / office phone number for display & general reference.</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="edit-page-id">Facebook Page ID <span style="font-weight: normal; color: var(--text-muted);">(Optional if Instagram provided)</span></label>
+          <input type="text" id="edit-page-id" class="form-control" placeholder="e.g. 116439281052574">
+        </div>
+        <div class="form-group">
+          <label for="edit-instagram-handle">Instagram Handle / ID <span style="font-weight: normal; color: var(--text-muted);">(Optional if Facebook provided)</span></label>
+          <input type="text" id="edit-instagram-handle" class="form-control" placeholder="e.g. @serum_labs">
+        </div>
+        <div class="form-group">
+          <label for="edit-client-template" style="display: flex; justify-content: space-between; align-items: center;">
+            <span>WhatsApp Message Template</span>
+            <span style="font-size: 10px; font-weight: 600; color: #2563eb; background: #eff6ff; padding: 2px 7px; border-radius: 6px; text-transform: uppercase;">Per-client format</span>
+          </label>
+          <select id="edit-client-template" class="form-control" style="font-size: 13px;">
+            <option value="">Default (Photo Header + Post Link)</option>
+            <option value="business_ig_media_link_alert">📸 Photo Header + Post Link (Image + URL)</option>
+            <option value="business_post_link_exact">🔗 Post Link Alert (Text Only)</option>
+            <option value="business_media_post_alert">🖼️ Photo Header Only (No URL)</option>
+            <option value="business_compact_engagement">⚡ Compact Engagement (Clean Greeting + Post Link)</option>
+            <option value="business_post_published_link_alert">📝 Detailed Post Alert (Greeting + Caption + Link)</option>
+            <option value="tms_post_published_alert">🏢 TMS Service Alert (Team TMS Format)</option>
+          </select>
+          <span class="form-hint" style="font-size: 11px; color: var(--text-muted); margin-top: 3px; display: block;">Select which WhatsApp template format is dispatched when a post goes live.</span>
+        </div>
+        <div style="margin: 18px 0 10px 0; border-top: 1px solid #e2e8f0; padding-top: 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <div>
+              <span style="font-size: 12px; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: 0.5px;">Contact Persons & WhatsApp Alert Numbers</span>
+              <span style="display: block; font-size: 11px; color: var(--text-muted); margin-top: 2px;">Add as many recipients as needed. Every number gets personalized alerts with their own name.</span>
+            </div>
+            <button type="button" id="btn-edit-add-contact-row" class="btn btn-xs btn-outline-primary" style="font-size: 11px; padding: 5px 12px; display: inline-flex; align-items: center; gap: 5px; border-radius: 6px; font-weight: 600;">
+              <span style="font-weight: bold; font-size: 13px; line-height: 1;">+</span>
+              <span>Add Recipient</span>
+            </button>
+          </div>
+          <div id="edit-contacts-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
+        </div>
+        <div class="form-group">
+          <label for="edit-status">Status</label>
+          <select id="edit-status" class="form-control">
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 24px;">
+          <button type="button" class="btn btn-secondary" style="flex: 1;" id="btn-cancel-edit-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="flex: 2;">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Display Details Modal -->
+  <div class="modal-overlay" id="view-client-modal">
+    <div class="modal-box" style="max-width: 680px;">
+      <div class="modal-head">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#4f46e5" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <h3 class="card-title" style="margin: 0; font-size: 17px;">Client Display Details</h3>
+        </div>
+        <button class="modal-close" id="btn-close-view-modal">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 18px 22px;">
+        <!-- Company Info Header Card -->
+        <div style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <div id="view-client-avatar" class="company-avatar" style="width: 44px; height: 44px; font-size: 16px; border-radius: 10px;">CL</div>
+            <div>
+              <h2 id="view-company-name" style="margin: 0; font-size: 17px; font-weight: 700; color: #0f172a;">Company Name</h2>
+              <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                <span class="code-chip" id="view-client-id" style="font-size: 11px;">ID</span>
+                <span id="view-status-badge"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Details Grid -->
+        <div style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 14px;">
+          <div class="view-details-row">
+            <!-- Company Phone for Info -->
+            <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; background: #ffffff;">
+              <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; gap: 6px;">
+                <span>Company Phone</span>
+                <span style="background: #eef2ff; color: #4338ca; padding: 1px 6px; border-radius: 4px; font-size: 9.5px; font-weight: 600; white-space: nowrap;">Office Reference</span>
+              </div>
+              <div id="view-company-phone-box" style="font-size: 14px; font-weight: 600; color: #1e293b; font-family: var(--font-mono); display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                <!-- Filled via JS -->
+              </div>
+            </div>
+
+            <!-- Social Media Channels -->
+            <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; background: #ffffff;">
+              <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Connected Channels</div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="view-social-channels">
+                <!-- Filled via JS -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Alert Recipients -->
+          <div style="border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; background: #ffffff;">
+            <div style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+              <span>WhatsApp Alert Recipients</span>
+              <span style="font-size: 10.5px; font-weight: normal; color: var(--text-muted); text-transform: none; letter-spacing: 0;">Receive live post publication alerts</span>
+            </div>
+            <div id="view-contacts-list" style="display: flex; flex-direction: column; gap: 6px;">
+              <!-- Filled via JS -->
+            </div>
+          </div>
+
+          <!-- Approved WhatsApp Alert Preview -->
+          <div style="border: 1px solid #c7d2fe; border-radius: 8px; padding: 12px 14px; background: #f8faff;">
+            <div style="font-size: 11px; font-weight: 700; color: #4338ca; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+              <span style="display: flex; align-items: center; gap: 6px;">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                WhatsApp Notification Preview
+              </span>
+              <span style="background: #ecfdf5; color: #047857; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; white-space: nowrap;">Meta Approved</span>
+            </div>
+            <div id="view-template-preview" style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; line-height: 1.5; color: #1e293b;">
+              <!-- Filled via JS -->
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 8px;">
+          <button type="button" class="btn btn-secondary" style="flex: 1;" id="btn-close-view-modal-2">Close</button>
+          <button type="button" class="btn btn-primary" style="flex: 1;" id="btn-view-edit-shortcut">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            <span>Edit This Client</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container" role="status" aria-live="polite"></div>
+
+  <script src="/static/operations.js"></script><script src="app.js?v=20261110_v12"></script>
+</body>
+</html>
