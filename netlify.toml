@@ -1,24 +1,24 @@
 [[redirects]]
   from = "/api/*"
-  to = "http://62.72.29.27:8050/api/:splat"
+  to = "https://apiautomation.iryax.com/api/:splat"
   status = 200
   force = true
 
 [[redirects]]
   from = "/auth/*"
-  to = "http://62.72.29.27:8050/auth/:splat"
+  to = "https://apiautomation.iryax.com/auth/:splat"
   status = 200
   force = true
 
 [[redirects]]
   from = "/health"
-  to = "http://62.72.29.27:8050/health"
+  to = "https://apiautomation.iryax.com/health"
   status = 200
   force = true
 
 [[redirects]]
   from = "/webhook/*"
-  to = "http://62.72.29.27:8050/webhook/:splat"
+  to = "https://apiautomation.iryax.com/webhook/:splat"
   status = 200
   force = true
 
@@ -26,3 +26,4 @@
   from = "/login"
   to = "/login.html"
   status = 200
+

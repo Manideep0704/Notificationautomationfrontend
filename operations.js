@@ -1,13 +1,13 @@
-function generatePostId() {
-  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
-    return 'POST_' + window.crypto.randomUUID().replaceAll('-', '').slice(0, 24);
+// Safe UUID generator (HTTP aur HTTPS dono par chalega)
+function generateSafeUUID() {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
   }
-  if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
-    const bytes = new Uint8Array(12);
-    window.crypto.getRandomValues(bytes);
-    return 'POST_' + Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
-  }
-  return 'POST_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 12);
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
 }
 
 function initOperations() {
@@ -44,7 +44,7 @@ function initOperations() {
     document.getElementById('view-subtitle').textContent = 'Connect accounts, publish approved content, and manage notification recovery.';
   });
   document.getElementById('btn-logout').addEventListener('click', async () => {
-    await fetch('/auth/logout', {method:'POST'});
+    await fetch('/auth/logout', { method: 'POST' });
     sessionStorage.removeItem('auth_token');
     sessionStorage.removeItem('csrf_token');
     window.__csrfToken = '';
@@ -55,34 +55,40 @@ function initOperations() {
   bindOperationForm('publish-form', '/api/publish', 'POST', 'publish-feedback', values => {
     delete values.approved; values.approval_status = 'approved'; return values;
   });
-  document.querySelector('#publish-form [name=post_id]').value = generatePostId();
+
+  // YAHAN CHANGE HUA HAI: crypto.randomUUID() ki jagah generateSafeUUID() use kiya hai
+  document.querySelector('#publish-form [name=post_id]').value = 'POST_' + generateSafeUUID().replaceAll('-', '').slice(0, 24);
+
   document.getElementById('refresh-queue').addEventListener('click', loadQueue);
   document.getElementById('validate-provider').addEventListener('click', async event => {
     event.target.disabled = true;
-    try { const result = await operationRequest('/api/integrations/validate',{method:'POST'}); document.getElementById('provider-feedback').textContent = result.message; }
+    try { const result = await operationRequest('/api/integrations/validate', { method: 'POST' }); document.getElementById('provider-feedback').textContent = result.message; }
     catch (error) { document.getElementById('provider-feedback').textContent = error.message; }
     finally { event.target.disabled = false; }
   });
 }
-async function operationRequest(url, options={}) {
+
+async function operationRequest(url, options = {}) {
   const response = await fetch(url, options); const result = await response.json();
   if (!response.ok) throw new Error(typeof result.detail === 'string' ? result.detail : 'Invalid input. Check the form fields.');
   return result;
 }
+
 function bindOperationForm(id, url, method, feedback, transform) {
   const form = document.getElementById(id);
   form.addEventListener('submit', async event => {
     event.preventDefault(); const button = form.querySelector('button'); button.disabled = true;
     const label = document.getElementById(feedback); label.textContent = 'Processing…';
     try {
-      const data = await operationRequest(url,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(transform(Object.fromEntries(new FormData(form))))});
+      const data = await operationRequest(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(transform(Object.fromEntries(new FormData(form)))) });
       label.textContent = data.message + (data.notification_status ? ' · Notification: ' + data.notification_status : '');
       if (id === 'account-form') form.elements.access_token.value = '';
       await loadQueue();
-    } catch(error) { label.textContent = error.message; }
+    } catch (error) { label.textContent = error.message; }
     finally { button.disabled = false; }
   });
 }
+
 async function loadOperationClients() {
   try {
     const clients = await operationRequest('/api/clients');
@@ -91,34 +97,36 @@ async function loadOperationClients() {
       for (const client of clients) { const option = document.createElement('option'); option.value = client.id; option.textContent = client.name; select.appendChild(option); }
       if ([...select.options].some(option => option.value === current)) select.value = current;
     });
-  } catch(error) { showToast(error.message,'danger'); }
+  } catch (error) { showToast(error.message, 'danger'); }
 }
+
 async function loadIntegrationStatus() {
   const label = document.getElementById('integration-summary');
   try {
     const data = await operationRequest('/api/integration-status');
     label.textContent = `WhatsApp: ${data.whatsapp_configured ? 'configured' : 'missing credentials'} · Signed webhooks: ${data.webhook_signatures_configured ? 'configured' : 'missing app secret'} · Account encryption: ${data.account_encryption_configured ? 'ready' : 'run administrator setup'} · Template: ${data.template_name} (${data.template_language})`;
-  } catch(error) { label.textContent = error.message; }
+  } catch (error) { label.textContent = error.message; }
 }
+
 async function loadQueue() {
   const body = document.getElementById('queue-body');
   try {
     const rows = await operationRequest('/api/delivery-queue'); body.replaceChildren();
-    if (!rows.length) { const row=body.insertRow(); row.insertCell().textContent='No notification attempts yet.'; return; }
+    if (!rows.length) { const row = body.insertRow(); row.insertCell().textContent = 'No notification attempts yet.'; return; }
     for (const item of rows) {
-      const row=body.insertRow();
-      for (const value of [item.post_id,item.client_id,item.state,item.attempts,item.error || '—']) row.insertCell().textContent=value;
-      const cell=row.insertCell();
-      if (['failed','uncertain'].includes(item.state)) {
-        const retry=document.createElement('button'); retry.className='btn btn-sm btn-secondary'; retry.textContent=item.state==='uncertain' ? 'Reconcile & Retry' : 'Retry'; cell.appendChild(retry);
+      const row = body.insertRow();
+      for (const value of [item.post_id, item.client_id, item.state, item.attempts, item.error || '—']) row.insertCell().textContent = value;
+      const cell = row.insertCell();
+      if (['failed', 'uncertain'].includes(item.state)) {
+        const retry = document.createElement('button'); retry.className = 'btn btn-sm btn-secondary'; retry.textContent = item.state === 'uncertain' ? 'Reconcile & Retry' : 'Retry'; cell.appendChild(retry);
         retry.addEventListener('click', async () => {
-          const uncertain=item.state==='uncertain';
+          const uncertain = item.state === 'uncertain';
           if (uncertain && !confirm('Have you checked provider records and confirmed this message was NOT accepted? Retrying an accepted message creates a duplicate.')) return;
-          retry.disabled=true;
-          try { await operationRequest('/api/notifications/'+encodeURIComponent(item.id)+'/retry',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({confirmed_not_sent:uncertain})}); await loadQueue(); }
-          catch(error) { showToast(error.message,'danger'); retry.disabled=false; }
+          retry.disabled = true;
+          try { await operationRequest('/api/notifications/' + encodeURIComponent(item.id) + '/retry', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ confirmed_not_sent: uncertain }) }); await loadQueue(); }
+          catch (error) { showToast(error.message, 'danger'); retry.disabled = false; }
         });
       }
     }
-  } catch(error) { body.replaceChildren(); body.insertRow().insertCell().textContent=error.message; }
+  } catch (error) { body.replaceChildren(); body.insertRow().insertCell().textContent = error.message; }
 }

@@ -1,13 +1,13 @@
 (() => {
-  const DEPLOYED_BACKEND_URL = 'http://62.72.29.27:8050';
-  const sameOriginFastApi =
+  const DEPLOYED_BACKEND_URL = 'https://apiautomation.iryax.com';
+  const sameOriginBackend =
     window.location.origin === DEPLOYED_BACKEND_URL ||
     window.location.port === '8050';
-  const isHttpsProxyHost = window.location.protocol === 'https:' && !sameOriginFastApi;
+  const hasPlatformProxy = /\.(vercel\.app|netlify\.app)$/i.test(window.location.hostname);
 
-  // Use relative path on same-origin FastAPI or HTTPS hosts (rewritten via vercel.json/netlify.toml);
-  // use direct backend URL on standalone HTTP hosts (localhost:3000, Live Server, etc.).
-  const API_BASE_URL = sameOriginFastApi || isHttpsProxyHost ? '' : DEPLOYED_BACKEND_URL;
+  // Use same-origin relative URLs when served directly from backend or via Vercel/Netlify proxy rewrites;
+  // otherwise call the deployed HTTPS backend URL directly (using Bearer + CSRF auth headers).
+  const API_BASE_URL = sameOriginBackend || hasPlatformProxy ? '' : DEPLOYED_BACKEND_URL;
 
   window.DEPLOYED_BACKEND_URL = DEPLOYED_BACKEND_URL;
   window.API_BASE_URL = API_BASE_URL;
@@ -20,11 +20,11 @@
   };
 
   window.navigateToLogin = () => {
-    location.assign(sameOriginFastApi ? '/login' : '/login.html');
+    location.assign(window.location.port === '8050' ? '/login' : '/login.html');
   };
 
   window.navigateToDashboard = () => {
-    location.assign(sameOriginFastApi ? '/' : '/index.html');
+    location.assign(window.location.port === '8050' ? '/' : '/index.html');
   };
 
   if (!window.__apiFetchInstalled) {
@@ -62,3 +62,4 @@
     };
   }
 })();
+
