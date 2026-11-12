@@ -18,6 +18,11 @@ const APP_STATE = {
     page: 1,
     pageSize: 12
   },
+  clientFilter: {
+    status: 'all',
+    page: 1,
+    pageSize: 12
+  },
   metrics: {
     total_posts: 0,
     delivered_notifications: 0,
@@ -623,12 +628,49 @@ function renderMetrics() {
 // ==============================================================================
 function initClientSearch() {
   const searchInput = document.getElementById('client-search-input');
-  if (!searchInput) return;
+  const statusSelect = document.getElementById('client-status-filter');
+  const prevBtn = document.getElementById('clients-prev-page');
+  const nextBtn = document.getElementById('clients-next-page');
 
-  searchInput.addEventListener('input', (e) => {
-    APP_STATE.searchFilter = e.target.value.trim().toLowerCase();
-    renderExcelClients();
-  });
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      APP_STATE.searchFilter = e.target.value.trim().toLowerCase();
+      APP_STATE.clientFilter.page = 1;
+      renderExcelClients();
+    });
+  }
+  if (statusSelect) {
+    statusSelect.addEventListener('change', (e) => {
+      APP_STATE.clientFilter.status = e.target.value;
+      APP_STATE.clientFilter.page = 1;
+      renderExcelClients();
+    });
+  }
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (APP_STATE.clientFilter.page > 1) {
+        APP_STATE.clientFilter.page -= 1;
+        renderExcelClients();
+      }
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      APP_STATE.clientFilter.page += 1;
+      renderExcelClients();
+    });
+  }
+}
+
+function clearClientFilters() {
+  APP_STATE.searchFilter = '';
+  APP_STATE.clientFilter.status = 'all';
+  APP_STATE.clientFilter.page = 1;
+  const searchInput = document.getElementById('client-search-input');
+  const statusSelect = document.getElementById('client-status-filter');
+  if (searchInput) searchInput.value = '';
+  if (statusSelect) statusSelect.value = 'all';
+  renderExcelClients();
 }
 
 async function fetchExcelClients() {
@@ -648,10 +690,18 @@ async function fetchExcelClients() {
 function renderExcelClients() {
   const tbody = document.getElementById('clients-table-body');
   const countChip = document.getElementById('client-count-chip');
+  const paginationEl = document.getElementById('clients-pagination');
+  const paginationInfo = document.getElementById('clients-pagination-info');
+  const pageLabel = document.getElementById('clients-page-label');
+  const prevBtn = document.getElementById('clients-prev-page');
+  const nextBtn = document.getElementById('clients-next-page');
   if (!tbody) return;
 
   const filter = APP_STATE.searchFilter;
+  const statusFilter = APP_STATE.clientFilter.status;
   const filteredClients = APP_STATE.excelClients.filter(c => {
+    const rowStatus = (c['Status'] || c['status'] || 'Active').toLowerCase();
+    if (statusFilter !== 'all' && rowStatus !== statusFilter) return false;
     if (!filter) return true;
     const clientId = (c['Client ID'] || c['client_id'] || '').toLowerCase();
     const clientName = (c['Client Name'] || c['Company Name'] || c['client_name'] || '').toLowerCase();
@@ -675,25 +725,43 @@ function renderExcelClients() {
   });
 
   if (countChip) {
-    if (filter) {
-      countChip.textContent = `${filteredClients.length} of ${APP_STATE.excelClients.length} clients matching`;
+    if (filter || statusFilter !== 'all') {
+      countChip.textContent = `${filteredClients.length} of ${APP_STATE.excelClients.length} clients`;
     } else {
-      countChip.textContent = `${activeCount} Active · ${APP_STATE.excelClients.length} Total Clients`;
+      countChip.textContent = `${activeCount} Active · ${APP_STATE.excelClients.length} Total`;
     }
   }
 
   if (sortedClients.length === 0) {
+    if (paginationEl) paginationEl.style.display = 'none';
     tbody.innerHTML = `
       <tr>
         <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">
-          ${filter ? `No clients matched your search "${escapeHtml(filter)}".` : 'No client records found in the directory. Click "Add Client" above to create one.'}
+          ${(filter || statusFilter !== 'all')
+            ? `<div style="margin-bottom: 10px;">No clients matched your current search or status filter.</div><button type="button" class="btn btn-sm btn-secondary" onclick="clearClientFilters()">Clear Filters</button>`
+            : 'No client records found in the directory. Click "Add Client" above to create one.'}
         </td>
       </tr>
     `;
     return;
   }
 
-  tbody.innerHTML = sortedClients.map((c) => {
+  const { pageSize } = APP_STATE.clientFilter;
+  const totalPages = Math.max(1, Math.ceil(sortedClients.length / pageSize));
+  const currentPage = Math.min(APP_STATE.clientFilter.page, totalPages);
+  APP_STATE.clientFilter.page = currentPage;
+  const startIdx = (currentPage - 1) * pageSize;
+  const pageClients = sortedClients.slice(startIdx, startIdx + pageSize);
+
+  if (paginationEl) {
+    paginationEl.style.display = sortedClients.length > pageSize ? 'flex' : 'none';
+    if (paginationInfo) paginationInfo.textContent = `Showing ${startIdx + 1}–${startIdx + pageClients.length} of ${sortedClients.length}`;
+    if (pageLabel) pageLabel.textContent = `Page ${currentPage} of ${totalPages}`;
+    if (prevBtn) prevBtn.disabled = currentPage <= 1;
+    if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+  }
+
+  tbody.innerHTML = pageClients.map((c) => {
     const idx = APP_STATE.excelClients.indexOf(c);
     const clientId = c['Client ID'] || c['client_id'] || '-';
     const clientName = c['Client Name'] || c['Company Name'] || c['client_name'] || '-';
@@ -750,32 +818,33 @@ function renderExcelClients() {
     const recipientsCell = contacts.map(ct => {
       const p = ct.phone || '';
       const cleanDigits = p.replace(/[^0-9]/g, '');
-      const titleBadge = `<span class="recipient-title-chip">${escapeHtml(ct.title || 'Mr.')}</span>`;
-      const nameSpan = `<span class="recipient-name-text">${escapeHtml(ct.name || '-')}</span>`;
+      const titleText = escapeHtml(ct.title || 'Mr.');
+      const nameText = escapeHtml(ct.name || '-');
+      const nameHtml = `<span class="recipient-name-text" title="${titleText} ${nameText}"><span class="recipient-title-muted">${titleText}</span>${nameText}</span>`;
       const phoneLink = cleanDigits
-        ? `<a href="https://wa.me/${escapeHtml(cleanDigits)}" target="_blank" rel="noopener noreferrer" class="phone-badge phone-badge-compact" title="Open WhatsApp chat with ${escapeHtml(ct.name || p)}">
+        ? `<a href="https://wa.me/${escapeHtml(cleanDigits)}" target="_blank" rel="noopener noreferrer" class="phone-badge phone-badge-compact" title="Open WhatsApp chat with ${nameText}">
              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
              <span>${escapeHtml(p)}</span>
            </a>`
-        : '<span style="color: var(--text-muted); font-size: 12px;">-</span>';
-      return `<div class="recipient-row">${titleBadge}${nameSpan}${phoneLink}</div>`;
+        : '<span style="color: var(--text-muted); font-size: 12px;">—</span>';
+      return `<div class="recipient-row">${nameHtml}${phoneLink}</div>`;
     }).join('');
 
     const companyPhone = c['Company Phone'] || c['company_phone'] || '';
     const tpl = c['WhatsApp Template'] || c['whatsapp_template'] || '';
     const map = {
-      'business_media_status_alert': '✅ Utility Photo + Link',
-      'business_ig_media_link_alert': '📸 Photo + Post Link',
-      'business_post_link_alert': '🔗 Post Link (Text)',
-      'business_post_link_exact': '🔗 Post Link (Text)',
-      'business_media_post_url_alert': '📸 Photo + Link (No Caption)',
-      'business_media_post_link_alert': '🖼️ Photo + Caption + Link',
-      'business_media_post_alert': '🖼️ Photo Only',
-      'business_compact_engagement': '⚡ Compact Link',
-      'business_post_published_link_alert': '📝 Detailed Alert',
-      'tms_post_published_alert': '🏢 TMS Alert'
+      'business_media_status_alert': 'Utility Photo + Link',
+      'business_ig_media_link_alert': 'Photo + Post Link',
+      'business_post_link_alert': 'Post Link (Text)',
+      'business_post_link_exact': 'Post Link (Text)',
+      'business_media_post_url_alert': 'Photo + Link',
+      'business_media_post_link_alert': 'Photo + Caption + Link',
+      'business_media_post_alert': 'Photo Only',
+      'business_compact_engagement': 'Compact Link',
+      'business_post_published_link_alert': 'Detailed Alert',
+      'tms_post_published_alert': 'TMS Alert'
     };
-    const tplLabel = tpl ? (map[tpl] || tpl) : '📸 Photo + Post Link (Default)';
+    const tplLabel = tpl ? (map[tpl] || tpl) : 'Photo + Post Link (Default)';
     const isCustomTpl = Boolean(tpl);
 
     return `
@@ -788,16 +857,9 @@ function renderExcelClients() {
             <div class="company-avatar">${getInitials(clientName)}</div>
             <div>
               <div class="company-name">${escapeHtml(clientName)}</div>
-              <div class="company-meta-row">
-                ${companyPhone ? `
-                  <span class="company-phone-chip" title="Official company phone displayed in footer">
-                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                    <span>${escapeHtml(companyPhone)}</span>
-                  </span>
-                ` : ''}
-                <span class="template-chip ${isCustomTpl ? 'template-chip-custom' : ''}" title="WhatsApp Template format used for this client">
-                  ${escapeHtml(tplLabel)}
-                </span>
+              <div class="company-sub-meta">
+                <span class="${isCustomTpl ? 'company-sub-custom' : ''}" title="WhatsApp Template format used for this client">${escapeHtml(tplLabel)}</span>
+                ${companyPhone ? `<span class="company-sub-sep">·</span><span title="Official company phone displayed in footer">${escapeHtml(companyPhone)}</span>` : ''}
               </div>
             </div>
           </div>
@@ -817,9 +879,8 @@ function renderExcelClients() {
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
               <span>Edit</span>
             </button>
-            <button class="btn btn-sm btn-outline-danger btn-delete-client" data-index="${idx}" title="Archive client">
+            <button class="btn btn-sm btn-outline-danger btn-icon-only btn-delete-client" data-index="${idx}" title="Archive client" aria-label="Archive client">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-              <span>Delete</span>
             </button>
           </div>
         </td>

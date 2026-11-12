@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iryax Global | Social Media Publishing & Client Automation Engine</title>
-  <link rel="stylesheet" href="styles.css?v=20261112_v1">
+  <link rel="stylesheet" href="styles.css?v=20261112_v2">
 </head>
 <body>
   <div class="app-layout">
@@ -188,6 +188,11 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 <input type="text" id="client-search-input" class="search-input" placeholder="Search by client, ID, Instagram handle, or phone...">
               </div>
+              <select id="client-status-filter" class="filter-select" aria-label="Filter clients by status">
+                <option value="all">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
               <span class="client-count-chip" id="client-count-chip">Synced from the client directory</span>
             </div>
             <div class="toolbar-actions">
@@ -210,12 +215,12 @@
             <table class="data-table clients-directory-table">
               <thead>
                 <tr>
-                  <th style="width: 96px;">Client ID</th>
+                  <th style="width: 110px;">Client ID</th>
                   <th>Company / Client</th>
                   <th>Social Channels</th>
                   <th>WhatsApp Alert Recipients</th>
                   <th style="width: 100px;">Status</th>
-                  <th style="text-align: right; width: 220px;">Actions</th>
+                  <th style="text-align: right; width: 185px;">Actions</th>
                 </tr>
               </thead>
               <tbody id="clients-table-body">
@@ -224,6 +229,14 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="table-pagination" id="clients-pagination" style="display: none;">
+            <span class="pagination-info" id="clients-pagination-info">Showing 0–0 of 0</span>
+            <div class="pagination-controls">
+              <button type="button" class="btn btn-sm btn-secondary" id="clients-prev-page">Previous</button>
+              <span class="pagination-page-label" id="clients-page-label">Page 1 of 1</span>
+              <button type="button" class="btn btn-sm btn-secondary" id="clients-next-page">Next</button>
+            </div>
           </div>
         </div>
       </div>
@@ -584,6 +597,6 @@
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toast-container" role="status" aria-live="polite"></div>
 
-  <script src="config.js"></script><script src="operations.js?v=20261112_v1"></script><script src="app.js?v=20261112_v1"></script>
+  <script src="config.js"></script><script src="operations.js?v=20261112_v2"></script><script src="app.js?v=20261112_v2"></script>
 </body>
 </html>
