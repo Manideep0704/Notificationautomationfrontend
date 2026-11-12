@@ -11,6 +11,13 @@ const APP_STATE = {
   excelClients: [],
   searchFilter: '',
   posts: [],
+  activityFilter: {
+    search: '',
+    platform: 'all',
+    alertStatus: 'all',
+    page: 1,
+    pageSize: 12
+  },
   metrics: {
     total_posts: 0,
     delivered_notifications: 0,
@@ -202,6 +209,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setInterval(checkConnection, 15000);
   initTabs();
   initTopActions();
+  initActivityFilters();
   initClientSearch();
   initAddClientModal();
   initEditClientModal();
@@ -336,11 +344,124 @@ async function fetchPosts() {
   }
 }
 
+function initActivityFilters() {
+  const searchEl = document.getElementById('activity-search-input');
+  const platformEl = document.getElementById('activity-platform-filter');
+  const alertEl = document.getElementById('activity-alert-filter');
+  const prevBtn = document.getElementById('activity-prev-page');
+  const nextBtn = document.getElementById('activity-next-page');
+
+  if (searchEl) {
+    searchEl.addEventListener('input', (e) => {
+      APP_STATE.activityFilter.search = e.target.value.trim().toLowerCase();
+      APP_STATE.activityFilter.page = 1;
+      renderPosts();
+    });
+  }
+  if (platformEl) {
+    platformEl.addEventListener('change', (e) => {
+      APP_STATE.activityFilter.platform = e.target.value;
+      APP_STATE.activityFilter.page = 1;
+      renderPosts();
+    });
+  }
+  if (alertEl) {
+    alertEl.addEventListener('change', (e) => {
+      APP_STATE.activityFilter.alertStatus = e.target.value;
+      APP_STATE.activityFilter.page = 1;
+      renderPosts();
+    });
+  }
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      if (APP_STATE.activityFilter.page > 1) {
+        APP_STATE.activityFilter.page -= 1;
+        renderPosts();
+      }
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      APP_STATE.activityFilter.page += 1;
+      renderPosts();
+    });
+  }
+}
+
+function clearActivityFilters() {
+  APP_STATE.activityFilter.search = '';
+  APP_STATE.activityFilter.platform = 'all';
+  APP_STATE.activityFilter.alertStatus = 'all';
+  APP_STATE.activityFilter.page = 1;
+  const searchEl = document.getElementById('activity-search-input');
+  const platformEl = document.getElementById('activity-platform-filter');
+  const alertEl = document.getElementById('activity-alert-filter');
+  if (searchEl) searchEl.value = '';
+  if (platformEl) platformEl.value = 'all';
+  if (alertEl) alertEl.value = 'all';
+  renderPosts();
+}
+
+function formatPostIdDisplay(id) {
+  const str = String(id || '');
+  if (str.length <= 18) return str;
+  return `${str.slice(0, 8)}…${str.slice(-6)}`;
+}
+
+async function copyPostId(postId) {
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(postId);
+    }
+    showToast(`Copied Post ID: ${postId}`, 'success');
+  } catch {
+    showToast('Could not copy Post ID to clipboard.', 'danger');
+  }
+}
+
 function renderPosts() {
   const tbody = document.getElementById('posts-table-body');
+  const countChip = document.getElementById('activity-count-chip');
+  const paginationEl = document.getElementById('activity-pagination');
+  const paginationInfo = document.getElementById('activity-pagination-info');
+  const pageLabel = document.getElementById('activity-page-label');
+  const prevBtn = document.getElementById('activity-prev-page');
+  const nextBtn = document.getElementById('activity-next-page');
   if (!tbody) return;
 
+  const { search, platform, alertStatus, pageSize } = APP_STATE.activityFilter;
+  const filteredPosts = APP_STATE.posts.filter((post) => {
+    const postPlatform = (post.platform || 'facebook').toLowerCase();
+    if (platform !== 'all' && postPlatform !== platform) return false;
+
+    const notifStatus = (post.notification_status || 'pending').toLowerCase();
+    if (alertStatus === 'sent_group' && !['sent', 'delivered', 'read'].includes(notifStatus)) return false;
+    if (alertStatus === 'read' && notifStatus !== 'read') return false;
+    if (alertStatus === 'failed' && notifStatus !== 'failed') return false;
+    if (alertStatus === 'pending' && !['pending', 'retrying', 'in_flight'].includes(notifStatus)) return false;
+
+    if (search) {
+      const haystack = [
+        post.id,
+        post.client_name,
+        post.client_id,
+        post.caption,
+        post.platform
+      ].filter(Boolean).join(' ').toLowerCase();
+      if (!haystack.includes(search)) return false;
+    }
+    return true;
+  });
+
+  if (countChip) {
+    const total = APP_STATE.posts.length;
+    countChip.textContent = filteredPosts.length === total
+      ? `${total} ${total === 1 ? 'event' : 'events'}`
+      : `${filteredPosts.length} of ${total} events`;
+  }
+
   if (APP_STATE.posts.length === 0) {
+    if (paginationEl) paginationEl.style.display = 'none';
     tbody.innerHTML = `
       <tr>
         <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 40px;">
@@ -351,7 +472,42 @@ function renderPosts() {
     return;
   }
 
-  tbody.innerHTML = APP_STATE.posts.map(post => {
+  if (filteredPosts.length === 0) {
+    if (paginationEl) paginationEl.style.display = 'none';
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 40px;">
+          <div style="margin-bottom: 10px;">No log entries match your current search or filters.</div>
+          <button type="button" class="btn btn-sm btn-secondary" onclick="clearActivityFilters()">Clear Filters</button>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  const totalPages = Math.max(1, Math.ceil(filteredPosts.length / pageSize));
+  const currentPage = Math.min(APP_STATE.activityFilter.page, totalPages);
+  APP_STATE.activityFilter.page = currentPage;
+
+  const startIdx = (currentPage - 1) * pageSize;
+  const pagePosts = filteredPosts.slice(startIdx, startIdx + pageSize);
+
+  if (paginationEl) {
+    paginationEl.style.display = filteredPosts.length > pageSize ? 'flex' : 'none';
+    if (paginationInfo) {
+      paginationInfo.textContent = `Showing ${startIdx + 1}–${startIdx + pagePosts.length} of ${filteredPosts.length}`;
+    }
+    if (pageLabel) pageLabel.textContent = `Page ${currentPage} of ${totalPages}`;
+    if (prevBtn) prevBtn.disabled = currentPage <= 1;
+    if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+  }
+
+  const checkIcon = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  const doubleCheckIcon = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 6 7 17 2 12"/><polyline points="22 10 13.5 18.5 11 16"/></svg>';
+  const alertFailIcon = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+  const copyIcon = '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+
+  tbody.innerHTML = pagePosts.map(post => {
     // Status Badge
     let statusBadge = '<span class="badge badge-secondary"><span class="badge-dot"></span> Draft</span>';
     if (post.status === 'published') {
@@ -363,15 +519,17 @@ function renderPosts() {
     }
 
     // Notification Badge
-    let notifBadge = '<span class="badge badge-secondary">Pending</span>';
+    let notifBadge = '<span class="badge badge-secondary"><span class="badge-dot"></span> Pending</span>';
     if (post.notification_status === 'read') {
-      notifBadge = '<span class="badge badge-success" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd;">✓✓ Blue Ticks</span>';
+      notifBadge = `<span class="badge badge-success" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd;">${doubleCheckIcon}<span>Blue Ticks</span></span>`;
     } else if (post.notification_status === 'delivered') {
-      notifBadge = '<span class="badge badge-success">✓✓ Delivered</span>';
+      notifBadge = `<span class="badge badge-success">${doubleCheckIcon}<span>Delivered</span></span>`;
     } else if (post.notification_status === 'sent') {
-      notifBadge = '<span class="badge badge-info">✓ Sent</span>';
+      notifBadge = `<span class="badge badge-info">${checkIcon}<span>Sent</span></span>`;
+    } else if (post.notification_status === 'retrying' || post.notification_status === 'in_flight') {
+      notifBadge = '<span class="badge badge-warning"><span class="badge-dot"></span> Retrying</span>';
     } else if (post.notification_status === 'failed') {
-      notifBadge = '<span class="badge badge-danger">✕ Alert Failed</span>';
+      notifBadge = `<span class="badge badge-danger">${alertFailIcon}<span>Alert Failed</span></span>`;
     }
 
     const captionSnippet = post.caption 
@@ -383,19 +541,24 @@ function renderPosts() {
            <span>View Post</span>
            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
          </a>`
-      : '<span style="color: var(--text-muted); font-size: 12px;">-</span>';
+      : '<span style="color: var(--text-muted); font-size: 12px;">—</span>';
 
-    const platform = (post.platform || 'facebook').toLowerCase();
-    const platformBadge = platform === 'instagram'
-      ? `<span class="social-badge social-badge-instagram" style="padding: 3px 8px; font-size: 11px;">Instagram</span>`
-      : `<span class="social-badge social-badge-facebook" style="padding: 3px 8px; font-size: 11px;">Facebook</span>`;
+    const postPlatform = (post.platform || 'facebook').toLowerCase();
+    const platformBadge = postPlatform === 'instagram'
+      ? `<span class="social-badge social-badge-instagram" style="padding: 3px 10px; font-size: 11.5px;">Instagram</span>`
+      : `<span class="social-badge social-badge-facebook" style="padding: 3px 10px; font-size: 11.5px;">Facebook</span>`;
 
     const clientName = post.client_name || post.client_id || 'Client';
+    const postIdStr = String(post.id || '');
+    const postIdEscaped = escapeHtml(postIdStr);
 
     return `
       <tr>
         <td>
-          <span class="code-chip">${escapeHtml(post.id)}</span>
+          <button type="button" class="code-chip code-chip-copy" title="Copy full Post ID: ${postIdEscaped}" onclick="copyPostId('${postIdEscaped.replace(/'/g, '&#39;')}')">
+            <span>${escapeHtml(formatPostIdDisplay(postIdStr))}</span>
+            ${copyIcon}
+          </button>
         </td>
         <td>
           <div class="company-cell">
@@ -410,7 +573,7 @@ function renderPosts() {
         <td>${statusBadge}</td>
         <td>
           <div>${notifBadge}</div>
-          <div style="font-size: 11px; color: var(--text-muted); margin-top: 3px;">via ${escapeHtml(post.notification_channel || 'whatsapp')}</div>
+          <div class="notif-channel-sub">via ${escapeHtml(post.notification_channel || 'whatsapp')}</div>
         </td>
         <td style="font-size: 12.5px; color: var(--text-muted); white-space: nowrap;">
           ${escapeHtml(post.published_at || '-')}

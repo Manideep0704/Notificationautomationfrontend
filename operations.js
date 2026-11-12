@@ -13,7 +13,9 @@ function generateSafeUUID() {
 function initOperations() {
   const nav = document.querySelector('.nav-menu');
   const button = document.createElement('button');
-  button.className = 'nav-btn'; button.dataset.tab = 'tab-operations'; button.textContent = 'Publishing & Delivery'; nav.appendChild(button);
+  button.className = 'nav-btn'; button.dataset.tab = 'tab-operations';
+  button.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Publishing &amp; Delivery</span>';
+  nav.appendChild(button);
   const pane = document.createElement('section'); pane.id = 'tab-operations'; pane.className = 'tab-content';
   pane.innerHTML = `
   <div class="card" style="padding:24px;margin-bottom:20px"><h2>Publish a social post</h2><p class="form-hint">Publishes real content to the selected account, then sends a client notification. Use a unique request ID per intended post.</p>
@@ -36,7 +38,7 @@ function initOperations() {
     <button class="btn btn-primary" type="submit">Save Account</button>
   </form><p id="account-feedback" role="status" class="operation-feedback"></p></div>
   <div class="card" style="padding:24px;margin-bottom:20px"><h2>Integration readiness</h2><p id="integration-summary" class="operation-feedback"></p><button class="btn btn-secondary" id="validate-provider">Verify Sender & Template</button><p id="provider-feedback" role="status" class="operation-feedback"></p></div>
-  <div class="card" style="padding:24px"><div style="display:flex;justify-content:space-between;gap:12px"><h2>Delivery queue</h2><button class="btn btn-secondary" id="refresh-queue">Refresh</button></div><p class="form-hint">Rate-limit rejections retry automatically. Uncertain sends need provider reconciliation.</p><div style="overflow:auto"><table style="width:100%"><thead><tr><th>Post</th><th>Client</th><th>State</th><th>Attempts</th><th>Details</th><th>Action</th></tr></thead><tbody id="queue-body"></tbody></table></div></div>`;
+  <div class="card" style="padding:24px"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px"><h2 style="margin:0">Delivery queue</h2><button class="btn btn-secondary" id="refresh-queue">Refresh</button></div><p class="form-hint" style="margin-bottom:16px">Rate-limit rejections retry automatically. Uncertain sends need provider reconciliation.</p><div class="table-responsive"><table class="data-table"><thead><tr><th>Post</th><th>Client</th><th>State</th><th>Attempts</th><th>Details</th><th style="text-align:right">Action</th></tr></thead><tbody id="queue-body"></tbody></table></div></div>`;
   document.querySelector('.main-content').appendChild(pane);
   button.addEventListener('click', () => {
     loadOperationClients(); loadQueue(); loadIntegrationStatus();

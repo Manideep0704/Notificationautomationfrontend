@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Iryax Global | Social Media Publishing & Client Automation Engine</title>
-  <link rel="stylesheet" href="styles.css?v=20261110_v3">
+  <link rel="stylesheet" href="styles.css?v=20261112_v1">
 </head>
 <body>
   <div class="app-layout">
@@ -123,9 +123,28 @@
         </div>
 
         <div class="card">
-          <div class="card-toolbar">
+          <div class="card-toolbar activity-toolbar">
             <div class="toolbar-left">
-              <h3 class="card-title" style="font-size: 15px; font-weight: 700; color: #0f172a;">Recent Publishing & WhatsApp Log</h3>
+              <h3 class="card-title" style="font-size: 15px; font-weight: 700; color: #0f172a; margin: 0;">Recent Publishing & WhatsApp Log</h3>
+              <span class="client-count-chip" id="activity-count-chip">0 events</span>
+            </div>
+            <div class="toolbar-actions activity-filters">
+              <div class="search-box" style="min-width: 220px; max-width: 280px;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" id="activity-search-input" class="search-input" placeholder="Search post ID, client, caption...">
+              </div>
+              <select id="activity-platform-filter" class="filter-select" aria-label="Filter by platform">
+                <option value="all">All Platforms</option>
+                <option value="instagram">Instagram</option>
+                <option value="facebook">Facebook</option>
+              </select>
+              <select id="activity-alert-filter" class="filter-select" aria-label="Filter by WhatsApp alert status">
+                <option value="all">All Alerts</option>
+                <option value="sent_group">Sent / Delivered</option>
+                <option value="read">Blue Ticks (Read)</option>
+                <option value="failed">Alert Failed</option>
+                <option value="pending">Pending / Retrying</option>
+              </select>
             </div>
           </div>
           <div class="table-responsive">
@@ -148,6 +167,14 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="table-pagination" id="activity-pagination" style="display: none;">
+            <span class="pagination-info" id="activity-pagination-info">Showing 0–0 of 0</span>
+            <div class="pagination-controls">
+              <button type="button" class="btn btn-sm btn-secondary" id="activity-prev-page">Previous</button>
+              <span class="pagination-page-label" id="activity-page-label">Page 1 of 1</span>
+              <button type="button" class="btn btn-sm btn-secondary" id="activity-next-page">Next</button>
+            </div>
           </div>
         </div>
       </div>
@@ -557,6 +584,6 @@
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toast-container" role="status" aria-live="polite"></div>
 
-  <script src="config.js"></script><script src="operations.js"></script><script src="app.js?v=20261110_v12"></script>
+  <script src="config.js"></script><script src="operations.js?v=20261112_v1"></script><script src="app.js?v=20261112_v1"></script>
 </body>
 </html>
