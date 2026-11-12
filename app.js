@@ -601,6 +601,7 @@ function renderExcelClients() {
     const companyPhone = c['Company Phone'] || c['company_phone'] || '';
     const tpl = c['WhatsApp Template'] || c['whatsapp_template'] || '';
     const map = {
+      'business_media_status_alert': '✅ Utility Photo + Link',
       'business_ig_media_link_alert': '📸 Photo + Post Link',
       'business_post_link_alert': '🔗 Post Link (Text)',
       'business_post_link_exact': '🔗 Post Link (Text)',
@@ -1139,7 +1140,27 @@ function initViewClientModal() {
         const tplKey = client['WhatsApp Template'] || client['whatsapp_template'] || 'business_ig_media_link_alert';
         let tplContent = '';
 
-        if (tplKey === 'business_compact_engagement') {
+        if (tplKey === 'business_media_status_alert') {
+          tplContent = `
+            <div style="color: #4338ca; font-weight: 600; margin-bottom: 6px; font-size: 11px; display: flex; justify-content: space-between;">
+              <span>Template: <code>business_media_status_alert</code></span>
+              <span style="color: #059669; font-weight: 600;">UTILITY (Photo + Post Link)</span>
+            </div>
+            <div style="background: #ffffff; padding: 12px; border: 1px solid #e0e7ff; border-radius: 6px; line-height: 1.6; font-size: 12.5px;">
+              <div style="background: #f1f5f9; border: 1px dashed #94a3b8; border-radius: 6px; padding: 16px; text-align: center; color: #475569; margin-bottom: 10px; font-weight: 600;">
+                🖼️ [Instagram Published Post Image Header]
+              </div>
+              Account notification from <strong>${escapeHtml(clientName)}</strong><br><br>
+              Your scheduled social media post has been published. ✅<br><br>
+              <strong>Post Link :</strong><br>
+              <span style="color: #4f46e5; text-decoration: underline;">https://www.instagram.com/p/Dfjop59CvrU/</span><br><br>
+              This is an automated publication confirmation for your account.<br><br>
+              Regards,<br>
+              👤 <strong>${escapeHtml(fullOwner)}</strong><br>
+              📞 <strong>${escapeHtml(officialNumber || '(Company Phone)')}</strong> 🙏
+            </div>
+          `;
+        } else if (tplKey === 'business_compact_engagement') {
           tplContent = `
             <div style="color: #4338ca; font-weight: 600; margin-bottom: 6px; font-size: 11px; display: flex; justify-content: space-between;">
               <span>Template: <code>business_compact_engagement</code></span>
